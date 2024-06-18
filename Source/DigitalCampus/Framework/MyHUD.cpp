@@ -37,7 +37,7 @@ void AMyHUD::DrawHUD()
 	}
 	GS_ThisTimeSearch = 0;
 
-	float ShowUserTime = MyGameState->ShowUser_APTime;
+	float ShowUserTime = ShowUser_APTime;
 
 	float StartX = ShowUserTime;
 	float StartY = 0;

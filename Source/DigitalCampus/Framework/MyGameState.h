@@ -18,7 +18,6 @@ public:
 	double APValue;
 	const int32 DailyMinutes = 1439;
 	int32 Map_AP_KeyTemp;
-	float ShowUser_APTime;
 
 	float GetMaxValueOfAP();
 protected:
