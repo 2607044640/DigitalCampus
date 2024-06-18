@@ -15,18 +15,22 @@ class DIGITALCAMPUS_API AMyGameState : public AGameState
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
 	TMap<int32, float> Map_AP;
+	double APValue;
+	const int32 DailyMinutes = 1439;
+	int32 Map_AP_KeyTemp;
+	float ShowUser_APTime;
 
-	const int32 DailyMinutes = 1440;
-
+	float GetMaxValueOfAP();
 protected:
-	int32 Map_AP_Key = 0;
-	int32 Map_AP_KeyBefore = 0;
-	
+	int32 Map_AP_NextKey;
+	int32 Map_AP_ThisKey;
+
 	virtual void BeginPlay() override;
+	void InitApBaseValue();
 	void InitMap_AP();
 
 	UFUNCTION(BlueprintCallable)
-	bool GetNextKey();
+	int32 GetNextKey();
 	UFUNCTION(BlueprintCallable)
 	void AddTillFullMap();
 	GENERATED_BODY()

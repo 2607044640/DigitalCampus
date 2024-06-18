@@ -6,7 +6,16 @@
 void AMyGameState::BeginPlay()
 {
 	Super::BeginPlay();
+	InitApBaseValue();
 	InitMap_AP();
+}
+
+void AMyGameState::InitApBaseValue()
+{
+	Map_AP_ThisKey = 0;
+	Map_AP_NextKey = 0;
+	Map_AP_KeyTemp = 0;
+	APValue = 0;
 }
 
 void AMyGameState::InitMap_AP()
@@ -15,7 +24,6 @@ void AMyGameState::InitMap_AP()
 
 	Map_AP.Add(0, 0);
 	Map_AP.Add(1, 2);
-	Map_AP.Add(DailyMinutes - 1, 1);
 
 	//test 1440不会被Get到
 	Map_AP.Add(15, 5000.999);
@@ -26,46 +34,64 @@ void AMyGameState::InitMap_AP()
 	Map_AP.Add(130, 100.999);
 	Map_AP.Add(120, 100.999);
 	Map_AP.Add(1420, 1000.999);
+	Map_AP.Add(1430, 100);
+	Map_AP.Add(DailyMinutes - 2, 0);
+	Map_AP.Add(DailyMinutes - 1, 1);
+	Map_AP.Add(DailyMinutes, 2);
 	//test key不能相同
+	Map_AP.KeyStableSort([](const int32& A, const int32& B) { return A > B; });
+
+	GetNextKey();
+	GetNextKey();
+	AddTillFullMap();
+
 	Map_AP.KeyStableSort([](const int32& A, const int32& B) { return A > B; });
 }
 
-bool AMyGameState::GetNextKey()
+int32 AMyGameState::GetNextKey()
 {
-	for (int32 i = Map_AP_Key + 1; i < DailyMinutes; ++i)
+	for (int32 i = Map_AP_NextKey + 1; i < DailyMinutes; ++i)
 	{
 		if (Map_AP.Contains(i))
 		{
-			Map_AP_KeyBefore = Map_AP_Key;
-			Map_AP_Key = i;
-			// FString TempStr = FString::Printf(TEXT("%i"), Map_AP_KeyBefore);
-			// if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TempStr, true);
-			// UE_LOG(LogTemp, Error, TEXT("%s"), *TempStr);
-			// FString rfwe = FString::Printf(TEXT("Map_AP_Key %i"), Map_AP_Key);
-			// GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, rfwe, true, FVector2D(3, 3));
-			// UE_LOG(LogTemp, Error, TEXT("%s"), *rfwe);
-			return true;
+			Map_AP_ThisKey = Map_AP_NextKey;
+			Map_AP_KeyTemp = Map_AP_ThisKey;
+			Map_AP_NextKey = i;
+			return Map_AP_NextKey;
 		}
 	}
-	return false;
+	return -1;
 }
 
 void AMyGameState::AddTillFullMap()
 {
-	float TempAPValue = Map_AP[Map_AP_Key] - Map_AP[Map_AP_KeyBefore];
-	int32 TempAPKey = Map_AP_Key - Map_AP_KeyBefore;
-	const float AverageValue = TempAPValue / TempAPKey;
-	float Value = 0;
-	for (int i = Map_AP_KeyBefore + 1; i < Map_AP_Key; ++i)
+	for (int i = 0; i < DailyMinutes; ++i)
 	{
-		Value += AverageValue;
-		Map_AP.Add(i, Value);
+		double TempAPValue = static_cast<double>(Map_AP[Map_AP_NextKey]) - static_cast<double>(Map_AP[
+			Map_AP_ThisKey]);
+		double TempDevValue = TempAPValue / static_cast<double>(Map_AP_NextKey - Map_AP_ThisKey);
 
-		FString TempStr = FString::Printf(TEXT("i  %i"), i);
-		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TempStr, true);
-		UE_LOG(LogTemp, Error, TEXT("%s"), *TempStr);
-		FString rfwe = FString::Printf(TEXT("Map_AP_KeyBefore %f"), Value);
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, rfwe, true, FVector2D(3, 3));
-		UE_LOG(LogTemp, Error, TEXT("%s"), *rfwe);
+		APValue += TempDevValue;
+
+		if (Map_AP_NextKey == ++Map_AP_KeyTemp)
+		{
+			GetNextKey();
+			Map_AP.KeyStableSort([](const int32& A, const int32& B) { return A > B; });
+		}
+		Map_AP.Add(Map_AP_KeyTemp, APValue < 0 ? 0 : APValue);
 	}
+}
+
+float AMyGameState::GetMaxValueOfAP()
+{
+	float Map_APMaxValue = TNumericLimits<float>::Lowest();
+	for (TTuple<signed int, float>
+	     AP : Map_AP)
+	{
+		if (AP.Value > Map_APMaxValue)
+		{
+			Map_APMaxValue = AP.Value;
+		}
+	}
+	return  Map_APMaxValue;
 }

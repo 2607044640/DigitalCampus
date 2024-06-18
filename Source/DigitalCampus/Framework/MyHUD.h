@@ -12,6 +12,7 @@
 UCLASS()
 class DIGITALCAMPUS_API AMyHUD : public AHUD
 {
-	
+	virtual void DrawHUD() override;
 	GENERATED_BODY()
+	float GS_ThisTimeSearch;
 };
