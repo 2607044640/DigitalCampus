@@ -15,21 +15,31 @@ class DIGITALCAMPUS_API AMyHUD : public AHUD
 {
 	virtual void DrawHUD() override;
 	GENERATED_BODY()
-	float GS_ThisTimeSearch;
+	float DrawLengthX;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
+	float Edge=20;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
+	float ScaleX = 1.8;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
+	float ScaleY = 1.8;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
+	bool bUserTouchedSlider;
+
 	UPROPERTY(BlueprintReadOnly)
 	UUMG_Main* MainUI;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
 	double ShowUser_APTime;
 
 protected:
 	virtual void BeginPlay() override;
 
-template <typename T>
-void MakeUserWidget(T*& ObjectPtr, const TCHAR* Path);
-
+	template <typename T>
+	void MakeUserWidget(T*& ObjectPtr, const TCHAR* Path);
 };
+
 template <typename T>
 void AMyHUD::MakeUserWidget(T*& ObjectPtr, const TCHAR* Path)
 {

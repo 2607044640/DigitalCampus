@@ -15,6 +15,9 @@ class DIGITALCAMPUS_API UUMG_SliderToControlDrawImg : public UUserWidget
 {
 	UPROPERTY(meta=(BindWidget))
 	USlider* Slider;
+public:
+	UPROPERTY(BlueprintReadOnly)
+	float SliderTimeKey;
 	virtual void NativeConstruct() override;
 	UFUNCTION()
 	void OnValueChanged(float Value);

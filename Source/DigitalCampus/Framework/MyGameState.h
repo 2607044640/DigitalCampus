@@ -13,7 +13,7 @@ UCLASS()
 class DIGITALCAMPUS_API AMyGameState : public AGameState
 {
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
+	UPROPERTY(BlueprintReadOnly, Category=Setting)
 	TMap<int32, float> Map_AP;
 	double APValue;
 	int32 Map_AP_KeyTemp;

@@ -26,7 +26,11 @@ void AMyGameState::InitMap_AP()
 
 	Map_AP.Add(0, 0);
 	Map_AP.Add(1, 2);
+	Map_AP.Add(DailyMinutes - 2, 0);
+	Map_AP.Add(DailyMinutes - 1, 1);
+	Map_AP.Add(DailyMinutes, 2);
 
+	
 	//test 1440不会被Get到
 	Map_AP.Add(15, 5000.999);
 	Map_AP.Add(50, 8000.999);
@@ -37,10 +41,8 @@ void AMyGameState::InitMap_AP()
 	Map_AP.Add(120, 100.999);
 	Map_AP.Add(1420, 1000.999);
 	Map_AP.Add(1430, 100);
-	Map_AP.Add(DailyMinutes - 2, 0);
-	Map_AP.Add(DailyMinutes - 1, 1);
-	Map_AP.Add(DailyMinutes, 2);
 	//test key不能相同
+	
 	Map_AP.KeyStableSort([](const int32& A, const int32& B) { return A > B; });
 
 	GetNextKey();

@@ -5,9 +5,9 @@
 
 #include "Components/Slider.h"
 #include "DigitalCampus/DigitalCampus.h"
-#include "DigitalCampus/Framework/MyGameState.h"
 #include "DigitalCampus/Framework/MyHUD.h"
 #include "Kismet/GameplayStatics.h"
+
 
 void UUMG_SliderToControlDrawImg::NativeConstruct()
 {
@@ -18,5 +18,7 @@ void UUMG_SliderToControlDrawImg::NativeConstruct()
 void UUMG_SliderToControlDrawImg::OnValueChanged(float Value)
 {
 	AMyHUD* MyHUD = Cast<AMyHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
-	MyHUD->ShowUser_APTime = static_cast<double>(Value) * static_cast<double>(DailyMinutes);
+	SliderTimeKey = static_cast<double>(Value) * static_cast<double>(DailyMinutes);
+	MyHUD->bUserTouchedSlider=true;
+	MyHUD->ShowUser_APTime = SliderTimeKey;
 }
