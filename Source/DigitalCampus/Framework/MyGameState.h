@@ -16,7 +16,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
 	TMap<int32, float> Map_AP;
 	double APValue;
-	const int32 DailyMinutes = 1439;
 	int32 Map_AP_KeyTemp;
 
 	float GetMaxValueOfAP();

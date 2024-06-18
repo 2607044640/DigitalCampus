@@ -3,4 +3,4 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
+inline const int& DailyMinutes = 1439;

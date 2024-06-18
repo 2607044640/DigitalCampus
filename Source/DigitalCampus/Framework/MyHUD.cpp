@@ -3,7 +3,16 @@
 
 #include "MyHUD.h"
 #include "MyGameState.h"
+#include "DigitalCampus/DigitalCampus.h"
+#include "DigitalCampus/Other/Paths.h"
 #include "Kismet/GameplayStatics.h"
+#include "DigitalCampus/UMG/UMG_Main.h"//do not delete this!
+
+void AMyHUD::BeginPlay()
+{
+	Super::BeginPlay();
+	MakeUserWidget(MainUI, *WBP_Main_Path);
+}
 
 void AMyHUD::DrawHUD()
 {
@@ -15,10 +24,10 @@ void AMyHUD::DrawHUD()
 
 	float Edge = 20.f;
 	AMyGameState* MyGameState = Cast<AMyGameState>(UGameplayStatics::GetGameState(GetWorld()));
-	float EveryLengthY = static_cast<double>(LengthY) / static_cast<double>(MyGameState->GetMaxValueOfAP());
+	const float EveryLengthY = static_cast<double>(LengthY) / static_cast<double>(MyGameState->GetMaxValueOfAP());
+	const float EveryLengthX = static_cast<double>(LengthX) / static_cast<double>(DailyMinutes);
 
-
-	for (int i = 0; i < MyGameState->DailyMinutes; ++i)
+	for (int i = 0; i < DailyMinutes; ++i)
 	{
 		float StartX = GS_ThisTimeSearch;
 		float StartY = MyGameState->Map_AP.Contains(GS_ThisTimeSearch)
@@ -28,8 +37,7 @@ void AMyHUD::DrawHUD()
 		float EndY = MyGameState->Map_AP.Contains(GS_ThisTimeSearch + 1)
 			             ? EveryLengthY * MyGameState->Map_AP[GS_ThisTimeSearch + 1]
 			             : 0;
-		GS_ThisTimeSearch += static_cast<double>(LengthX) / static_cast<double>(MyGameState->
-			DailyMinutes);
+		GS_ThisTimeSearch += EveryLengthX;
 		FLinearColor DrawLineLinearColor(.1f, .50f, .99f, 1.0f);
 		DrawLine(Edge + ScaleX * (StartX), Edge + ScaleY * (LengthY - StartY),
 		         Edge + ScaleX * (EndX), Edge + ScaleY * (LengthY - EndY),
@@ -37,7 +45,7 @@ void AMyHUD::DrawHUD()
 	}
 	GS_ThisTimeSearch = 0;
 
-	float ShowUserTime = ShowUser_APTime;
+	float ShowUserTime = ShowUser_APTime * EveryLengthX;
 
 	float StartX = ShowUserTime;
 	float StartY = 0;

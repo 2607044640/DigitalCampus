@@ -3,6 +3,8 @@
 
 #include "MyGameState.h"
 
+#include "DigitalCampus/DigitalCampus.h"
+
 void AMyGameState::BeginPlay()
 {
 	Super::BeginPlay();
