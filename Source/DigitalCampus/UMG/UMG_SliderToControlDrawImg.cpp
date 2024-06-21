@@ -18,7 +18,6 @@ void UUMG_SliderToControlDrawImg::NativeConstruct()
 void UUMG_SliderToControlDrawImg::OnValueChanged(float Value)
 {
 	AMyHUD* MyHUD = Cast<AMyHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
-	SliderTimeKey = static_cast<double>(Value) * static_cast<double>(DailyMinutes);
 	MyHUD->bUserTouchedSlider=true;
-	MyHUD->ShowUser_APTime = SliderTimeKey;
+	MyHUD->ShowUser_APTime = static_cast<double>(Value) * static_cast<double>(DailyMinutes);
 }

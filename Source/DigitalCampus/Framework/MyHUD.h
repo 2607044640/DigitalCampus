@@ -19,7 +19,7 @@ class DIGITALCAMPUS_API AMyHUD : public AHUD
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
-	float Edge=20;
+	float Edge = 20;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
 	float ScaleX = 1.8;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
@@ -31,7 +31,7 @@ public:
 	UUMG_Main* MainUI;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
-	double ShowUser_APTime;
+	double ShowUser_APTime=1;
 
 protected:
 	virtual void BeginPlay() override;
