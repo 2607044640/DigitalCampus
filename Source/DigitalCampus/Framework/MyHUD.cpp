@@ -34,8 +34,8 @@ void AMyHUD::DrawHUD()
 			             : 0;
 		DrawLengthX += EveryLengthX;
 		FLinearColor DrawLineLinearColor(.1f, .50f, .99f, 1.0f);
-		DrawLine(Edge + ScaleX * (StartX), Edge + ScaleY * (LengthY - StartY),
-		         Edge + ScaleX * (EndX), Edge + ScaleY * (LengthY - EndY),
+		DrawLine(EdgeX + ScaleX * (StartX), EdgeY + ScaleY * (LengthY - StartY),
+		         EdgeX + ScaleX * (EndX), EdgeY + ScaleY * (LengthY - EndY),
 		         DrawLineLinearColor, 2);
 	}
 	DrawLengthX = 0;
@@ -50,8 +50,8 @@ void AMyHUD::DrawHUD()
 		             : 0;
 	FLinearColor DrawLineLFinearColor(0.0f, 0.0f, 1.0f, 1.0f);
 	float LineThickness = 2;
-	DrawLine(Edge + ScaleX * (StartX), Edge + ScaleY * (LengthY - StartY),
-	         Edge + ScaleX * (EndX), Edge + ScaleY * (LengthY - EndY),
+	DrawLine(EdgeX + ScaleX * (StartX), EdgeY + ScaleY * (LengthY - StartY),
+	         EdgeX + ScaleX * (EndX), EdgeY + ScaleY * (LengthY - EndY),
 	         DrawLineLFinearColor, LineThickness);
 
 

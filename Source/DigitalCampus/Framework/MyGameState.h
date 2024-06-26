@@ -17,7 +17,7 @@ public:
 	TMap<int32, float> Map_AP;
 	double APValue;
 	int32 Map_AP_KeyTemp;
-
+	UFUNCTION(BlueprintCallable)
 	float GetMaxValueOfAP();
 protected:
 	int32 Map_AP_NextKey;
