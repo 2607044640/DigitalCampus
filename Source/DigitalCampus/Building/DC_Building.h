@@ -15,7 +15,7 @@ class DIGITALCAMPUS_API ADC_Building : public AActor
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
-	float BuildingHeight=100;
+	float BuildingHeight=0;
 	UFUNCTION(BlueprintCallable)
 	void StaticMeshComponentOnClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
 	ADC_Building();

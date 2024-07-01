@@ -21,6 +21,7 @@ void FindMyObject(T*& YourObject, const TCHAR* Path)
 
 void AMyDefaultPawn::TimelineStart(ADC_Building* InBuilding)
 {
+	CameraComponent->bUsePawnControlRotation = false;
 	LeftMouseDown = false;
 	RightMouseDown = false;
 	Building = InBuilding;
@@ -30,6 +31,11 @@ void AMyDefaultPawn::TimelineStart(ADC_Building* InBuilding)
 
 void AMyDefaultPawn::OnMouseClickedFunc()
 {
+	if (TickRotationbyBuilding)
+	{
+		GetController()->SetControlRotation(CameraComponent->GetComponentRotation());
+		CameraComponent->bUsePawnControlRotation = true;
+	}
 	TickRotationbyBuilding = false;
 }
 
@@ -39,20 +45,26 @@ AMyDefaultPawn::AMyDefaultPawn()
 	FindMyObject<UCurveFloat>(CurveFloat, *BuildingCurve_Path);
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComponent->bUsePawnControlRotation = true;
+	SpringArmComponent->bDoCollisionTest = false;
 	SpringArmComponent->SetupAttachment(RootComponent);
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CamaraComp"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
+}
+
+void AMyDefaultPawn::SetRotationByBuilding()
+{
+	//Rotation
+	FVector StartLocation = GetActorLocation();
+	FVector TargetLocation = Building->GetActorLocation();
+	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation, TargetLocation);
+	CameraComponent->SetWorldRotation(LookAtRotation);
 }
 
 void AMyDefaultPawn::OnTimelineTick(float DeltaTime)
 {
 	if (!LeftMouseDown || !RightMouseDown)
 	{
-		//Rotation
-		FVector StartLocation = GetActorLocation();
-		FVector TargetLocation = Building->GetActorLocation();
-		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation, TargetLocation);
-		SpringArmComponent->SetWorldRotation(LookAtRotation);
+		SetRotationByBuilding();
 
 
 		//Location
@@ -70,18 +82,11 @@ void AMyDefaultPawn::OnTimelineTick(float DeltaTime)
 	}
 }
 
-void AMyDefaultPawn::RotatePawnByBuilding()
-{
-}
-
 void AMyDefaultPawn::OnTimelineEndEvent()
 {
 	if (!LeftMouseDown || !RightMouseDown)
 	{
 		TickRotationbyBuilding = true;
-		FTimerHandle TempHandle;
-		GetWorld()->GetTimerManager().SetTimer(TempHandle, this, &AMyDefaultPawn::RotatePawnByBuilding,
-		                                       RotatePawnByBuildingRate, true);
 	}
 }
 
@@ -105,7 +110,7 @@ void AMyDefaultPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	TimelineBegin();
-	OnMouseClicked.AddDynamic(this, &AMyDefaultPawn::OnMouseClickedFunc);
+	OnMouseClicked.AddUObject(this, &AMyDefaultPawn::OnMouseClickedFunc);
 }
 
 FHitResult AMyDefaultPawn::LineTraceSingleForObjects_CameraShoot(float Distance,
@@ -132,11 +137,7 @@ void AMyDefaultPawn::Tick(float DeltaTime)
 	MyTimeline.TickTimeline(DeltaTime);
 	if (TickRotationbyBuilding)
 	{
-		//Rotation
-		FVector StartLocation = GetActorLocation();
-		FVector TargetLocation = Building->GetActorLocation();
-		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation, TargetLocation);
-		SpringArmComponent->SetWorldRotation(LookAtRotation);
+		SetRotationByBuilding();
 
 		//Location
 		FVector CenterLocation = Building->GetActorLocation();
@@ -159,7 +160,7 @@ void AMyDefaultPawn::LeftMouse()
 	LeftMouseDown = true;
 	if (OnMouseClicked.IsBound())
 	{
-		OnMouseClicked.Execute();
+		OnMouseClicked.Broadcast();
 	}
 }
 
@@ -169,7 +170,7 @@ void AMyDefaultPawn::RightMouse()
 	RightMouseDown = true;
 	if (OnMouseClicked.IsBound())
 	{
-		OnMouseClicked.Execute();
+		OnMouseClicked.Broadcast();
 	}
 }
 

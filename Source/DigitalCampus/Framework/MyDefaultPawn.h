@@ -32,24 +32,22 @@ public:
 
 public:
 	AMyDefaultPawn();
+	void SetRotationByBuilding();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
-	float RotatePawnByBuildingSpeed=10;
+	float RotatePawnByBuildingSpeed = 0.01;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
-	float RotatePawnByBuildingRate=0.1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=jfsetting)
-	ADC_Building* Building;
+	float RotatePawnByBuildingRate = 0.01;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=jfsetting)
 	UCurveFloat* CurveFloat;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=jfsetting)
-	double RandomMin = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=jfsetting)
-	double RandomMax = 1000;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=jfsetting)
 	float PlayerRate = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=jfsetting)
-	float DistanceBetweenBuilding;
+	float DistanceBetweenBuilding=700;
 
 protected:
+	UPROPERTY()
+	ADC_Building* Building;
 	FVector NormalizeLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
 	TSubclassOf<ADC_Building> BuildingFromPlayer;
@@ -73,7 +71,6 @@ public:
 protected:
 	UFUNCTION()
 	void OnTimelineTick(float DeltaTime);
-	void RotatePawnByBuilding();
 	UFUNCTION()
 	void OnTimelineEndEvent();
 	void TimelineBegin();
