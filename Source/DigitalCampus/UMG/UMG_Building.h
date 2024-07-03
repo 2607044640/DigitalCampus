@@ -13,5 +13,4 @@ UCLASS()
 class DIGITALCAMPUS_API UUMG_Building : public UUserWidget
 {
 	GENERATED_BODY()
-
 };

@@ -4,6 +4,8 @@
 #include "MyDefaultPawn.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Components/WidgetInteractionComponent.h"
 #include "DigitalCampus/Building/DC_Building.h"
 #include "DigitalCampus/Other/Paths.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -41,6 +43,9 @@ void AMyDefaultPawn::OnMouseClickedFunc()
 
 AMyDefaultPawn::AMyDefaultPawn()
 {
+	WidgetInteractionComponent = CreateDefaultSubobject<
+		UWidgetInteractionComponent>(TEXT("WidgetInteractionComponent"));
+	WidgetInteractionComponent->SetupAttachment(RootComponent);
 	PrimaryActorTick.bCanEverTick = true;
 	FindMyObject<UCurveFloat>(CurveFloat, *BuildingCurve_Path);
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
@@ -66,7 +71,6 @@ void AMyDefaultPawn::OnTimelineTick(float DeltaTime)
 	{
 		SetRotationByBuilding();
 
-
 		//Location
 		FVector Distance = SavedTempLocation - Building->GetActorLocation();
 		UKismetMathLibrary::Vector_Normalize(Distance);
@@ -78,6 +82,8 @@ void AMyDefaultPawn::OnTimelineTick(float DeltaTime)
 	}
 	else
 	{
+		GetController()->SetControlRotation(CameraComponent->GetComponentRotation());
+		CameraComponent->bUsePawnControlRotation = true;
 		MyTimeline.Stop();
 	}
 }
@@ -134,30 +140,53 @@ FHitResult AMyDefaultPawn::LineTraceSingleForObjects_CameraShoot(float Distance,
 void AMyDefaultPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 	MyTimeline.TickTimeline(DeltaTime);
 	if (TickRotationbyBuilding)
 	{
 		SetRotationByBuilding();
+		if (Building)
+		{
+			if (Building->AddedWidgetComponent || Building->BuildingMainWidgetComponent)
+			{
+				Building->BuildingMainWidgetComponent->SetHiddenInGame(true);
+				Building->AddedWidgetComponent->SetHiddenInGame(true);
+			}
 
-		//Location
-		FVector CenterLocation = Building->GetActorLocation();
-		FVector Direction = GetActorLocation() - CenterLocation;
 
-		float DeltaAngle = RotatePawnByBuildingSpeed;
-		float CosAngle = FMath::Cos(DeltaAngle);
-		float SinAngle = FMath::Sin(DeltaAngle);
+			//Location
+			FVector CenterLocation = Building->GetActorLocation();
+			FVector Direction = GetActorLocation() - CenterLocation;
 
-		float NewX = Direction.X * CosAngle - Direction.Y * SinAngle;
-		float NewY = Direction.X * SinAngle + Direction.Y * CosAngle;
+			float DeltaAngle = RotatePawnByBuildingSpeed;
+			float CosAngle = FMath::Cos(DeltaAngle);
+			float SinAngle = FMath::Sin(DeltaAngle);
 
-		FVector NewLocation = CenterLocation + FVector(NewX, NewY, Direction.Z);
-		SetActorLocation(NewLocation);
+			float NewX = Direction.X * CosAngle - Direction.Y * SinAngle;
+			float NewY = Direction.X * SinAngle + Direction.Y * CosAngle;
+
+			FVector NewLocation = CenterLocation + FVector(NewX, NewY, Direction.Z);
+			SetActorLocation(NewLocation);
+		}
+	}
+	else
+	{
+		if (Building)
+		{
+			if (Building->AddedWidgetComponent || Building->BuildingMainWidgetComponent)
+			{
+				Building->BuildingMainWidgetComponent->SetHiddenInGame(false);
+				Building->AddedWidgetComponent->SetHiddenInGame(false);
+			}
+		}
 	}
 }
 
-void AMyDefaultPawn::LeftMouse()
+void AMyDefaultPawn::LeftMousePressed()
 {
 	LeftMouseDown = true;
+	WidgetInteractionComponent->PressPointerKey(EKeys::LeftMouseButton);
+
 	if (OnMouseClicked.IsBound())
 	{
 		OnMouseClicked.Broadcast();
@@ -174,9 +203,20 @@ void AMyDefaultPawn::RightMouse()
 	}
 }
 
+void AMyDefaultPawn::LeftMouseReleased()
+{
+	WidgetInteractionComponent->ReleasePointerKey(EKeys::LeftMouseButton);
+}
+
+void AMyDefaultPawn::RightMouseReleased()
+{
+}
+
 void AMyDefaultPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAction("LeftMouse", IE_Pressed, this, &AMyDefaultPawn::LeftMouse);
+	PlayerInputComponent->BindAction("LeftMouse", IE_Pressed, this, &AMyDefaultPawn::LeftMousePressed);
+	PlayerInputComponent->BindAction("LeftMouse", IE_Released, this, &AMyDefaultPawn::LeftMouseReleased);
 	PlayerInputComponent->BindAction("RightMouse", IE_Pressed, this, &AMyDefaultPawn::RightMouse);
+	PlayerInputComponent->BindAction("LeftMouse", IE_Released, this, &AMyDefaultPawn::RightMouseReleased);
 }

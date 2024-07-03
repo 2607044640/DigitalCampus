@@ -7,6 +7,7 @@
 #include "GameFramework/DefaultPawn.h"
 #include "MyDefaultPawn.generated.h"
 
+class UWidgetInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
 DECLARE_MULTICAST_DELEGATE(FOnMouseClicked);
@@ -17,6 +18,7 @@ UCLASS()
 class DIGITALCAMPUS_API AMyDefaultPawn : public ADefaultPawn
 {
 	GENERATED_BODY()
+	
 	bool RightMouseDown;
 	bool LeftMouseDown;
 	FVector SavedTempLocation;
@@ -25,6 +27,8 @@ class DIGITALCAMPUS_API AMyDefaultPawn : public ADefaultPawn
 
 public:
 	//Components
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	UWidgetInteractionComponent* WidgetInteractionComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
 	USpringArmComponent* SpringArmComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
@@ -59,9 +63,11 @@ public:
 	void TimelineStart(ADC_Building* InBuilding);
 	virtual void Tick(float DeltaTime) override;
 
-	void LeftMouse();
+	void LeftMousePressed();
 	FOnMouseClicked OnMouseClicked;
 	void RightMouse();
+	void LeftMouseReleased();
+	void RightMouseReleased();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
