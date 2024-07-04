@@ -7,6 +7,7 @@
 #include "Components/WidgetComponent.h"
 #include "Components/WidgetInteractionComponent.h"
 #include "DigitalCampus/Building/DC_Building.h"
+#include "DigitalCampus/Components/BuildingStaticMeshComp.h"
 #include "DigitalCampus/Other/Paths.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -28,6 +29,7 @@ void AMyDefaultPawn::TimelineStart(ADC_Building* InBuilding)
 	LeftMouseDown = false;
 	RightMouseDown = false;
 	Building = InBuilding;
+	TickRotationbyBuildingSMComp = false;
 	SavedTempLocation = GetActorLocation();
 	MyTimeline.PlayFromStart();
 }
@@ -42,16 +44,15 @@ void AMyDefaultPawn::OnMouseClickedFunc()
 	TickRotationbyBuilding = false;
 }
 
-void AMyDefaultPawn::OnMouseClickStaticMesh(UStaticMeshComponent*& StaticMeshComponent)
+void AMyDefaultPawn::OnMouseClickStaticMesh(UBuildingStaticMeshComp*& StaticMeshComponent)
 {
 	BuildingStaticMeshComponent = StaticMeshComponent;
 	ADC_Building* InBuilding = Cast<ADC_Building>(BuildingStaticMeshComponent->GetOwner());
 	Building = InBuilding;
 
 	TickRotationbyBuildingSMComp = true;
-	
-	CameraComponent->bUsePawnControlRotation = false;
 
+	CameraComponent->bUsePawnControlRotation = false;
 }
 
 AMyDefaultPawn::AMyDefaultPawn()
@@ -231,8 +232,6 @@ void AMyDefaultPawn::RightMouse()
 		TickRotationbyBuildingSMComp = false;
 		GetController()->SetControlRotation(CameraComponent->GetComponentRotation());
 		CameraComponent->bUsePawnControlRotation = true;
-
-		
 	}
 
 	RightMouseDown = true;

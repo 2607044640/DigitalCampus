@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "DC_Building.generated.h"
 
+class UBuildingStaticMeshComp;
 class UWidgetComponent;
 
 USTRUCT()
@@ -24,12 +25,15 @@ UCLASS()
 class DIGITALCAMPUS_API ADC_Building : public AActor
 {
 	GENERATED_BODY()
-public:
-//todo
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
-	float SplitBuildingHeight;
 
-	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	float LengthOfSplitBuildingOut = 200;
+
+	//todo
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	// float SplitBuildingHeight;
+
 	UPROPERTY(EditAnywhere, Category=JFSetting)
 	TArray<FBuildingInfo> BuildingInfos;
 
@@ -38,17 +42,21 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
 	double UMGHeight = 300;
+	 UPROPERTY
+	(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	TSubclassOf<UUserWidget> WBP_Building;
 	UFUNCTION(BlueprintCallable)
 	void JFAddWidget(TSubclassOf<UUserWidget> InWidgetClass, FVector2D PosToAdd = FVector2D(0, 500));
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
-	TArray<UStaticMeshComponent*> AddedStaticMeshComponents;
-	
+	TArray<UBuildingStaticMeshComp*> AddedStaticMeshComponents;
 
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	UFUNCTION()
 	void StaticMeshComponentOnClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
 	ADC_Building();
+	UFUNCTION()
+	void ViewBuildingButtonOnClicked();
 	virtual void BeginPlay() override;
 	bool state;
 

@@ -7,6 +7,7 @@
 #include "GameFramework/DefaultPawn.h"
 #include "MyDefaultPawn.generated.h"
 
+class UBuildingStaticMeshComp;
 class UWidgetInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -26,9 +27,10 @@ class DIGITALCAMPUS_API AMyDefaultPawn : public ADefaultPawn
 	bool TickRotationbyBuildingSMComp;
 	void OnMouseClickedFunc();
 public:
-void OnMouseClickStaticMesh(UStaticMeshComponent*& StaticMeshComponent);	
+void OnMouseClickStaticMesh(UBuildingStaticMeshComp*& StaticMeshComponent);	
 
-	
+	UFUNCTION(BlueprintCallable)
+	void TimelineStart(ADC_Building* InBuilding);
 
 public:
 	//Components
@@ -79,8 +81,7 @@ protected:
 	UPROPERTY()
 	ADC_Building* Building;
 	
-	UFUNCTION(BlueprintCallable)
-	void TimelineStart(ADC_Building* InBuilding);
+
 public:
 	//Timeline
 	FTimeline MyTimeline;

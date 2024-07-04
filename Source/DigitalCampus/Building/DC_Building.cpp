@@ -3,12 +3,24 @@
 
 #include "DC_Building.h"
 
+#include "Components/Button.h"
 #include "Components/WidgetComponent.h"
 #include "DigitalCampus/Framework/MyDefaultPawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include"Components/StaticMeshComponent.h"
+#include "DigitalCampus/Components/BuildingStaticMeshComp.h"
+#include "DigitalCampus/Other/Paths.h"
+#include "DigitalCampus/UMG/UMG_Building.h"
 
+template <typename T>
+void FindMyClass(TSubclassOf<T>& YourSubClass, const TCHAR* Path)
+{
+	if (ConstructorHelpers::FClassFinder<T> ClassFinder(Path); ClassFinder.Succeeded())
+	{
+		YourSubClass = ClassFinder.Class;
+	}
+}
 
 void ADC_Building::OnConstruction(const FTransform& Transform)
 {
@@ -25,8 +37,8 @@ void ADC_Building::OnConstruction(const FTransform& Transform)
 			// InStaticMeshComponent->RegisterComponentWithWorld(GetWorld());
 			// InStaticMeshComponent->AttachToComponent(RootComponent,
 			// FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			UStaticMeshComponent* InStaticMeshComponent = Cast<UStaticMeshComponent>(
-				AddComponentByClass(UStaticMeshComponent::StaticClass(), false,
+			UBuildingStaticMeshComp* InStaticMeshComponent = Cast<UBuildingStaticMeshComp>(
+				AddComponentByClass(UBuildingStaticMeshComp::StaticClass(), false,
 				                    FTransform{
 					                    FRotator::ZeroRotator, FVector(0, 0, 0),
 					                    FVector(1, 1, 1)
@@ -75,7 +87,7 @@ void ADC_Building::JFAddWidget(TSubclassOf<UUserWidget> InWidgetClass, FVector2D
 void ADC_Building::StaticMeshComponentOnClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
 {
 	AMyDefaultPawn* MyDefaultPawn = Cast<AMyDefaultPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(TouchedComponent);
+	UBuildingStaticMeshComp* StaticMeshComponent = Cast<UBuildingStaticMeshComp>(TouchedComponent);
 
 	MyDefaultPawn->OnMouseClickStaticMesh(StaticMeshComponent);
 	// // BuildingMainWidgetComponent->SetHiddenInGame(true);
@@ -97,11 +109,24 @@ ADC_Building::ADC_Building()
 
 	BuildingMainWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("MainWidgetComponent"));
 	BuildingMainWidgetComponent->SetupAttachment(SceneComponent);
+
+	FindMyClass<UUserWidget>(WBP_Building, *WBP_Building_Path);
+	BuildingMainWidgetComponent->SetWidgetClass(WBP_Building);
+	
+}
+
+void ADC_Building::ViewBuildingButtonOnClicked()
+{
+	AMyDefaultPawn* MyDefaultPawn = Cast<AMyDefaultPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	MyDefaultPawn->TimelineStart(this);
 }
 
 void ADC_Building::BeginPlay()
 {
 	Super::BeginPlay();
+	UUMG_Building* UMG_Building = Cast<UUMG_Building>(BuildingMainWidgetComponent->GetWidget());
+	UMG_Building->Button_Building->OnClicked.AddDynamic(
+		this, &ADC_Building::ViewBuildingButtonOnClicked);
 }
 
 void ADC_Building::Tick(float DeltaTime)
