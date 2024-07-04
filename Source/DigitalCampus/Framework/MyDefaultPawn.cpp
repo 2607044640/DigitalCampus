@@ -21,6 +21,7 @@ void FindMyObject(T*& YourObject, const TCHAR* Path)
 	}
 }
 
+
 void AMyDefaultPawn::TimelineStart(ADC_Building* InBuilding)
 {
 	CameraComponent->bUsePawnControlRotation = false;
@@ -39,6 +40,18 @@ void AMyDefaultPawn::OnMouseClickedFunc()
 		CameraComponent->bUsePawnControlRotation = true;
 	}
 	TickRotationbyBuilding = false;
+}
+
+void AMyDefaultPawn::OnMouseClickStaticMesh(UStaticMeshComponent*& StaticMeshComponent)
+{
+	BuildingStaticMeshComponent = StaticMeshComponent;
+	ADC_Building* InBuilding = Cast<ADC_Building>(BuildingStaticMeshComponent->GetOwner());
+	Building = InBuilding;
+
+	TickRotationbyBuildingSMComp = true;
+	
+	CameraComponent->bUsePawnControlRotation = false;
+
 }
 
 AMyDefaultPawn::AMyDefaultPawn()
@@ -76,7 +89,7 @@ void AMyDefaultPawn::OnTimelineTick(float DeltaTime)
 		UKismetMathLibrary::Vector_Normalize(Distance);
 		FVector NewLocationFinal = UKismetMathLibrary::VLerp(SavedTempLocation, Building->GetActorLocation() +
 		                                                     Distance * DistanceBetweenBuilding + FVector(
-			                                                     0, 0, Building->BuildingHeight),
+			                                                     0, 0, Building->DefaultBuildingHeight),
 		                                                     CurveFloat->GetFloatValue(DeltaTime));
 		SetActorLocation(NewLocationFinal);
 	}
@@ -140,8 +153,24 @@ FHitResult AMyDefaultPawn::LineTraceSingleForObjects_CameraShoot(float Distance,
 void AMyDefaultPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	MyTimeline.TickTimeline(DeltaTime);
+
+
+	if (TickRotationbyBuildingSMComp)
+	{
+		//Rotation
+		FVector StartLocation = GetActorLocation();
+		FVector TargetLocation = BuildingStaticMeshComponent->GetComponentLocation();
+		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation, TargetLocation);
+		CameraComponent->SetWorldRotation(LookAtRotation);
+
+		FString TempStr = FString::Printf(TEXT("%f , %f , %f"), LookAtRotation.Pitch, TargetLocation.Y,
+		                                  TargetLocation.Z);
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TempStr, true, FVector2D(3, 3));
+		UE_LOG(LogTemp, Error, TEXT("%s"), *TempStr);
+	}
+
+
 	if (TickRotationbyBuilding)
 	{
 		SetRotationByBuilding();
@@ -184,9 +213,10 @@ void AMyDefaultPawn::Tick(float DeltaTime)
 
 void AMyDefaultPawn::LeftMousePressed()
 {
-	LeftMouseDown = true;
 	WidgetInteractionComponent->PressPointerKey(EKeys::LeftMouseButton);
 
+
+	LeftMouseDown = true;
 	if (OnMouseClicked.IsBound())
 	{
 		OnMouseClicked.Broadcast();
@@ -196,6 +226,15 @@ void AMyDefaultPawn::LeftMousePressed()
 
 void AMyDefaultPawn::RightMouse()
 {
+	if (TickRotationbyBuildingSMComp)
+	{
+		TickRotationbyBuildingSMComp = false;
+		GetController()->SetControlRotation(CameraComponent->GetComponentRotation());
+		CameraComponent->bUsePawnControlRotation = true;
+
+		
+	}
+
 	RightMouseDown = true;
 	if (OnMouseClicked.IsBound())
 	{

@@ -14,32 +14,45 @@ void ADC_Building::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	int TempNum = 0;
-	for (UStaticMesh*
-	     MeshToAdd : StaticMeshesToAdd)
+	int BuildNumCount = 0;
+	float BuildingHeight = 0;
+	for (FBuildingInfo BuildingInfo : BuildingInfos)
 	{
-		TempNum++;
-
-		// auto InStaticMeshComponent = NewObject<UStaticMeshComponent>(this);
-		// InStaticMeshComponent->RegisterComponentWithWorld(GetWorld());
-		// InStaticMeshComponent->AttachToComponent(RootComponent,
-		// FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		UStaticMeshComponent* InStaticMeshComponent = Cast<UStaticMeshComponent>(
-			AddComponentByClass(UStaticMeshComponent::StaticClass(), false,
-			                    FTransform{
-				                    FRotator::ZeroRotator, FVector(0, 0, TempNum * BuildingHeight), FVector(1, 1, 1)
-			                    },
-			                    false));
-		if (MeshToAdd)
+		for (int i = 0; i < BuildingInfo.BuildingCount; ++i)
 		{
-			InStaticMeshComponent->SetRelativeLocation(FVector(0, 0, TempNum * BuildingHeight));
-			InStaticMeshComponent->SetupAttachment(RootComponent);
-			InStaticMeshComponent->SetStaticMesh(MeshToAdd);
-			InStaticMeshComponent->OnClicked.AddDynamic(this, &ADC_Building::StaticMeshComponentOnClicked);
+			BuildNumCount++;
+			// auto InStaticMeshComponent = NewObject<UStaticMeshComponent>(this);
+			// InStaticMeshComponent->RegisterComponentWithWorld(GetWorld());
+			// InStaticMeshComponent->AttachToComponent(RootComponent,
+			// FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			UStaticMeshComponent* InStaticMeshComponent = Cast<UStaticMeshComponent>(
+				AddComponentByClass(UStaticMeshComponent::StaticClass(), false,
+				                    FTransform{
+					                    FRotator::ZeroRotator, FVector(0, 0, 0),
+					                    FVector(1, 1, 1)
+				                    },
+				                    false));
+			if (BuildingInfo.StaticMeshToAdd)
+			{
+				if (BuildingInfo.BuildingHeight == -1)
+				{
+					InStaticMeshComponent->SetRelativeLocation(FVector(0, 0, BuildingHeight + DefaultBuildingHeight));
+					BuildingHeight += DefaultBuildingHeight;
+				}
+				else
+				{
+					InStaticMeshComponent->SetRelativeLocation(
+						FVector(0, 0, BuildingHeight + BuildingInfo.BuildingHeight));
+					BuildingHeight += BuildingInfo.BuildingHeight;
+				}
+				InStaticMeshComponent->SetupAttachment(RootComponent);
+				InStaticMeshComponent->SetStaticMesh(BuildingInfo.StaticMeshToAdd);
+				InStaticMeshComponent->OnClicked.AddDynamic(this, &ADC_Building::StaticMeshComponentOnClicked);
+			}
 		}
 	}
-	
-	BuildingMainWidgetComponent->SetRelativeLocation(FVector(0, 0, TempNum * BuildingHeight + UMGHeight));
+
+	BuildingMainWidgetComponent->SetRelativeLocation(FVector(0, 0, BuildingHeight + UMGHeight));
 }
 
 void ADC_Building::JFAddWidget(TSubclassOf<UUserWidget> InWidgetClass, FVector2D PosToAdd)
@@ -62,9 +75,12 @@ void ADC_Building::JFAddWidget(TSubclassOf<UUserWidget> InWidgetClass, FVector2D
 void ADC_Building::StaticMeshComponentOnClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
 {
 	AMyDefaultPawn* MyDefaultPawn = Cast<AMyDefaultPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	// BuildingMainWidgetComponent->SetHiddenInGame(true);
-	// AddedWidgetComponent->SetHiddenInGame(true);
-	MyDefaultPawn->TimelineStart(this);
+	UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(TouchedComponent);
+
+	MyDefaultPawn->OnMouseClickStaticMesh(StaticMeshComponent);
+	// // BuildingMainWidgetComponent->SetHiddenInGame(true);
+	// // AddedWidgetComponent->SetHiddenInGame(true);
+	// MyDefaultPawn->TimelineStart(this);
 }
 
 

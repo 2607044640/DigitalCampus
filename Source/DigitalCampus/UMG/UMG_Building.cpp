@@ -2,3 +2,9 @@
 
 
 #include "UMG_Building.h"
+
+void UUMG_Building::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+}

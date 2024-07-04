@@ -23,7 +23,12 @@ class DIGITALCAMPUS_API AMyDefaultPawn : public ADefaultPawn
 	bool LeftMouseDown;
 	FVector SavedTempLocation;
 	bool TickRotationbyBuilding;
+	bool TickRotationbyBuildingSMComp;
 	void OnMouseClickedFunc();
+public:
+void OnMouseClickStaticMesh(UStaticMeshComponent*& StaticMeshComponent);	
+
+	
 
 public:
 	//Components
@@ -50,8 +55,8 @@ public:
 	float DistanceBetweenBuilding=700;
 
 protected:
-	UPROPERTY()
-	ADC_Building* Building;
+	
+	
 	FVector NormalizeLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
 	TSubclassOf<ADC_Building> BuildingFromPlayer;
@@ -59,8 +64,7 @@ protected:
 	                                                 TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes);
 	virtual void BeginPlay() override;
 
-public:
-	void TimelineStart(ADC_Building* InBuilding);
+	
 	virtual void Tick(float DeltaTime) override;
 
 	void LeftMousePressed();
@@ -69,7 +73,14 @@ public:
 	void LeftMouseReleased();
 	void RightMouseReleased();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	
+	UPROPERTY()
+	UStaticMeshComponent* BuildingStaticMeshComponent;
+	UPROPERTY()
+	ADC_Building* Building;
+	
+	UFUNCTION(BlueprintCallable)
+	void TimelineStart(ADC_Building* InBuilding);
 public:
 	//Timeline
 	FTimeline MyTimeline;

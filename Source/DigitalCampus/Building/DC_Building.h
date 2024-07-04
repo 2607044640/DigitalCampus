@@ -16,16 +16,25 @@ struct FBuildingInfo
 	int32 BuildingCount = 1;
 	UPROPERTY(EditAnywhere, Category=JFSetting)
 	float BuildingHeight = -1;
+	UPROPERTY(EditAnywhere, Category=JFSetting)
+	UStaticMesh* StaticMeshToAdd;
 };
 
 UCLASS()
 class DIGITALCAMPUS_API ADC_Building : public AActor
 {
 	GENERATED_BODY()
-
 public:
+//todo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
-	float BuildingHeight = 200;
+	float SplitBuildingHeight;
+
+	
+	UPROPERTY(EditAnywhere, Category=JFSetting)
+	TArray<FBuildingInfo> BuildingInfos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	float DefaultBuildingHeight = 200;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
 	double UMGHeight = 300;
@@ -33,8 +42,7 @@ public:
 	void JFAddWidget(TSubclassOf<UUserWidget> InWidgetClass, FVector2D PosToAdd = FVector2D(0, 500));
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
 	TArray<UStaticMeshComponent*> AddedStaticMeshComponents;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
-	TArray<UStaticMesh*> StaticMeshesToAdd;
+	
 
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;

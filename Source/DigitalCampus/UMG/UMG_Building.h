@@ -12,5 +12,8 @@
 UCLASS()
 class DIGITALCAMPUS_API UUMG_Building : public UUserWidget
 {
+	virtual void NativeConstruct() override;
+public:
+	
 	GENERATED_BODY()
 };
