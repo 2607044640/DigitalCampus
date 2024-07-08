@@ -174,28 +174,9 @@ void AMyDefaultPawn::BeginPlay()
 }
 
 
-void AMyDefaultPawn::SetTransformWhenViewBuilding()
-{
-<<<<<<< HEAD
-=======
-	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
-	FVector Startpoint = CameraManager->GetCameraLocation();
-	FVector Endpoint = CameraManager->GetActorForwardVector().GetSafeNormal() * Distance + CameraManager->
-		GetCameraLocation();
-
-	// ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1));
-
-	TArray<AActor*> ActorsToIgnore;
-	FHitResult OnHit;
-	UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), Startpoint, Endpoint, ObjectTypes, false,
-	                                                ActorsToIgnore,
-	                                                EDrawDebugTrace::Persistent, OnHit, true);
-	return OnHit;
-}
 
 void AMyDefaultPawn::SetTransformWhenViewBuilding()
 {
->>>>>>> 9190b283a8fddfa605785275468d5b70b8781894
 	if (TickRotationbyBuildingSMComp)
 	{
 		//Rotation
