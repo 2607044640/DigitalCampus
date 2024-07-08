@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DigitalCampus/Framework/MyDefaultPawn.h"
 #include "GameFramework/Actor.h"
 #include "DC_Building.generated.h"
 
+class UBuildingStaticMeshComp;
 class UWidgetComponent;
 
 USTRUCT()
@@ -24,12 +26,17 @@ UCLASS()
 class DIGITALCAMPUS_API ADC_Building : public AActor
 {
 	GENERATED_BODY()
-public:
-//todo
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
-	float SplitBuildingHeight;
 
-	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	float LengthOfSplitBuildingOut = 200;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	FVector BuildingRelativeDistanceFromPlayer;
+		
+	//todo
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	// float SplitBuildingHeight;
+
 	UPROPERTY(EditAnywhere, Category=JFSetting)
 	TArray<FBuildingInfo> BuildingInfos;
 
@@ -38,22 +45,36 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
 	double UMGHeight = 300;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	float ScaleOfMainWidgetComp = 1;
+
 	UFUNCTION(BlueprintCallable)
 	void JFAddWidget(TSubclassOf<UUserWidget> InWidgetClass, FVector2D PosToAdd = FVector2D(0, 500));
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
-	TArray<UStaticMeshComponent*> AddedStaticMeshComponents;
-	
 
-protected:
-	virtual void OnConstruction(const FTransform& Transform) override;
-	UFUNCTION()
-	void StaticMeshComponentOnClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
-	ADC_Building();
-	virtual void BeginPlay() override;
-	bool state;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	TArray<UBuildingStaticMeshComp*> AddedStaticMeshComponents;
 
 public:
+	UPROPERTY()
+	AMyDefaultPawn* MyDefaultPawn;
+	UFUNCTION()
+	void ViewBuildingButtonOnClicked();
+	UFUNCTION()
+	void OnMouseClickedBuildingStaticMesh(UBuildingStaticMeshComp* BuildingStaticMeshComp);
+
+protected:
+	UPROPERTY()
+	TSubclassOf<UUserWidget> WBP_Building;
+	virtual void OnConstruction(const FTransform& Transform) override;
+	ADC_Building();
+
+	virtual void BeginPlay() override;
+
 	virtual void Tick(float DeltaTime) override;
+
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
 	UWidgetComponent* AddedWidgetComponent;
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
