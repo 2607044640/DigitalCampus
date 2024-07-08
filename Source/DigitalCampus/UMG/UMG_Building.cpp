@@ -2,6 +2,7 @@
 
 
 #include "UMG_Building.h"
+#include "Components/Button.h"
 
 void UUMG_Building::NativeConstruct()
 {

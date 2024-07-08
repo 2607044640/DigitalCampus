@@ -9,7 +9,7 @@ public class DigitalCampus : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[]
-			{ "Core", "CoreUObject", "Engine", "InputCore", "UMG", "UMGEditor", "Slate" });
+			{ "Core", "CoreUObject", "Engine", "InputCore", "UMG", "UMGEditor", "Slate" ,"HTTP"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "VectorVM" });
 

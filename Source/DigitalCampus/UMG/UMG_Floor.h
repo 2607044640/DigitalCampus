@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "UMG_Main.generated.h"
+#include "UMG_Floor.generated.h"
 
-class UUMG_PawnInfoController;
+class UButton;
 /**
  * 
  */
 UCLASS()
-class DIGITALCAMPUS_API UUMG_Main : public UUserWidget
+class DIGITALCAMPUS_API UUMG_Floor : public UUserWidget
 {
 	UPROPERTY(meta=(BindWidget))
-	UUMG_PawnInfoController* PawnInfoController;
+	UButton* ViewBuilding;
 	GENERATED_BODY()
 };
