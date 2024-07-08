@@ -63,6 +63,11 @@ protected:
 	FVector NormalizeLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)
 	TSubclassOf<ADC_Building> BuildingFromPlayer;
+<<<<<<< HEAD
+=======
+	FHitResult LineTraceSingleForObjects_CameraShoot(float Distance,
+	                                                 TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes);
+>>>>>>> 9190b283a8fddfa605785275468d5b70b8781894
 	void SetTransformWhenViewBuilding();
 	virtual void BeginPlay() override;
 
