@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UMG_Building.generated.h"
 
+class UVerticalBox;
 class UButton;
 /**
  * 
@@ -18,5 +19,7 @@ class DIGITALCAMPUS_API UUMG_Building : public UUserWidget
 public:
 	UPROPERTY(meta=(BindWidget))
 	UButton* Button_Building;
+	UPROPERTY(meta=(BindWidget))
+	UVerticalBox* VerticalBox_Floors;
 	GENERATED_BODY()
 };

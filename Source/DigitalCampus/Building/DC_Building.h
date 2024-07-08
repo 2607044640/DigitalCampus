@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DigitalCampus/Framework/MyDefaultPawn.h"
 #include "GameFramework/Actor.h"
 #include "DC_Building.generated.h"
 
@@ -29,7 +30,9 @@ class DIGITALCAMPUS_API ADC_Building : public AActor
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
 	float LengthOfSplitBuildingOut = 200;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	FVector BuildingRelativeDistanceFromPlayer;
+		
 	//todo
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
 	// float SplitBuildingHeight;
@@ -42,26 +45,36 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
 	double UMGHeight = 300;
-	 UPROPERTY
-	(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
-	TSubclassOf<UUserWidget> WBP_Building;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	float ScaleOfMainWidgetComp = 1;
+
 	UFUNCTION(BlueprintCallable)
 	void JFAddWidget(TSubclassOf<UUserWidget> InWidgetClass, FVector2D PosToAdd = FVector2D(0, 500));
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
 	TArray<UBuildingStaticMeshComp*> AddedStaticMeshComponents;
 
-protected:
-	virtual void OnConstruction(const FTransform& Transform) override;
-	UFUNCTION()
-	void StaticMeshComponentOnClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
-	ADC_Building();
+public:
+	UPROPERTY()
+	AMyDefaultPawn* MyDefaultPawn;
 	UFUNCTION()
 	void ViewBuildingButtonOnClicked();
+	UFUNCTION()
+	void OnMouseClickedBuildingStaticMesh(UBuildingStaticMeshComp* BuildingStaticMeshComp);
+
+protected:
+	UPROPERTY()
+	TSubclassOf<UUserWidget> WBP_Building;
+	virtual void OnConstruction(const FTransform& Transform) override;
+	ADC_Building();
+
 	virtual void BeginPlay() override;
-	bool state;
+
+	virtual void Tick(float DeltaTime) override;
 
 public:
-	virtual void Tick(float DeltaTime) override;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
 	UWidgetComponent* AddedWidgetComponent;
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Setting)

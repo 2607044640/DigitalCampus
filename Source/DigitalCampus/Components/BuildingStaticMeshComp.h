@@ -4,24 +4,35 @@
 
 #include "CoreMinimal.h"
 #include "Components/StaticMeshComponent.h"
-#include "Components/TimelineComponent.h"
+#include "DigitalCampus/Framework/MyDefaultPawn.h"
 #include "BuildingStaticMeshComp.generated.h"
 
 /**
  * 
  */
+
+class UBuildingStaticMeshComp;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMouseClickedSM, UBuildingStaticMeshComp*);
+
 UCLASS()
 class DIGITALCAMPUS_API UBuildingStaticMeshComp : public UStaticMeshComponent
 {
 	GENERATED_BODY()
 
 public:
-	//Timeline
+	FOnMouseClickedSM OnMouseClickedBuildingStaticMesh;
 	UPROPERTY()
-	FTimeline MyTimeline;
-	
+	AMyDefaultPawn* MyDefaultPawn;
+	UPROPERTY()
+	ADC_Building* GetOwner_DC_Building;
 
 protected:
+	bool bIsClicked;
+	int32 FaceSituation;
+	FVector SavedLocation;
+	//Timeline
+	FTimeline SMComp_Timeline;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCurveFloat* CurveFloat;
 	UFUNCTION()
@@ -29,7 +40,17 @@ protected:
 	UFUNCTION()
 	void OnTimelineEndEvent();
 	//Timeline
-
-	UBuildingStaticMeshComp();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void BeginPlay() override;
+	UBuildingStaticMeshComp();
+public:
+	void MaterialFadeOut();
+	int32 CalcFace();
+	void SMComp_StartTimeline();
+	UFUNCTION()
+	void StaticMeshComponentOnClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
+	UPROPERTY()
+	UMaterialInterface* SavedMaterial;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=JFSetting)
+	UMaterialInstance* FadeOutMaterial;
 };

@@ -22,10 +22,21 @@ void FindMyClass(TSubclassOf<T>& YourSubClass, const TCHAR* Path)
 	}
 }
 
+void ADC_Building::OnMouseClickedBuildingStaticMesh(UBuildingStaticMeshComp* BuildingStaticMeshComp)
+{
+	// for (UBuildingStaticMeshComp*& AddedStaticMeshComponent : AddedStaticMeshComponents)
+	// {
+	// 	if (AddedStaticMeshComponent != BuildingStaticMeshComp)
+	// 	{
+	// 		AddedStaticMeshComponent->MaterialFadeOut();
+	// 	}
+	// }
+}
+
 void ADC_Building::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-
+	// todo lag
 	int BuildNumCount = 0;
 	float BuildingHeight = 0;
 	for (FBuildingInfo BuildingInfo : BuildingInfos)
@@ -37,34 +48,37 @@ void ADC_Building::OnConstruction(const FTransform& Transform)
 			// InStaticMeshComponent->RegisterComponentWithWorld(GetWorld());
 			// InStaticMeshComponent->AttachToComponent(RootComponent,
 			// FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			UBuildingStaticMeshComp* InStaticMeshComponent = Cast<UBuildingStaticMeshComp>(
+			UBuildingStaticMeshComp* InBuildingStaticMeshComp = Cast<UBuildingStaticMeshComp>(
 				AddComponentByClass(UBuildingStaticMeshComp::StaticClass(), false,
 				                    FTransform{
 					                    FRotator::ZeroRotator, FVector(0, 0, 0),
 					                    FVector(1, 1, 1)
 				                    },
 				                    false));
+			AddedStaticMeshComponents.Add(InBuildingStaticMeshComp);
 			if (BuildingInfo.StaticMeshToAdd)
 			{
 				if (BuildingInfo.BuildingHeight == -1)
 				{
-					InStaticMeshComponent->SetRelativeLocation(FVector(0, 0, BuildingHeight + DefaultBuildingHeight));
+					InBuildingStaticMeshComp->
+						SetRelativeLocation(FVector(0, 0, BuildingHeight + DefaultBuildingHeight));
 					BuildingHeight += DefaultBuildingHeight;
 				}
 				else
 				{
-					InStaticMeshComponent->SetRelativeLocation(
+					InBuildingStaticMeshComp->SetRelativeLocation(
 						FVector(0, 0, BuildingHeight + BuildingInfo.BuildingHeight));
 					BuildingHeight += BuildingInfo.BuildingHeight;
 				}
-				InStaticMeshComponent->SetupAttachment(RootComponent);
-				InStaticMeshComponent->SetStaticMesh(BuildingInfo.StaticMeshToAdd);
-				InStaticMeshComponent->OnClicked.AddDynamic(this, &ADC_Building::StaticMeshComponentOnClicked);
+				InBuildingStaticMeshComp->SetupAttachment(RootComponent);
+				InBuildingStaticMeshComp->SetStaticMesh(BuildingInfo.StaticMeshToAdd);
 			}
 		}
 	}
-
-	BuildingMainWidgetComponent->SetRelativeLocation(FVector(0, 0, BuildingHeight + UMGHeight));
+	if (BuildingMainWidgetComponent)
+	{
+		BuildingMainWidgetComponent->SetRelativeLocation(FVector(0, 0, BuildingHeight + UMGHeight));
+	}
 }
 
 void ADC_Building::JFAddWidget(TSubclassOf<UUserWidget> InWidgetClass, FVector2D PosToAdd)
@@ -84,17 +98,6 @@ void ADC_Building::JFAddWidget(TSubclassOf<UUserWidget> InWidgetClass, FVector2D
 	}
 }
 
-void ADC_Building::StaticMeshComponentOnClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
-{
-	AMyDefaultPawn* MyDefaultPawn = Cast<AMyDefaultPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	UBuildingStaticMeshComp* StaticMeshComponent = Cast<UBuildingStaticMeshComp>(TouchedComponent);
-
-	MyDefaultPawn->OnMouseClickStaticMesh(StaticMeshComponent);
-	// // BuildingMainWidgetComponent->SetHiddenInGame(true);
-	// // AddedWidgetComponent->SetHiddenInGame(true);
-	// MyDefaultPawn->TimelineStart(this);
-}
-
 
 ADC_Building::ADC_Building()
 {
@@ -112,28 +115,33 @@ ADC_Building::ADC_Building()
 
 	FindMyClass<UUserWidget>(WBP_Building, *WBP_Building_Path);
 	BuildingMainWidgetComponent->SetWidgetClass(WBP_Building);
-	
 }
 
 void ADC_Building::ViewBuildingButtonOnClicked()
 {
-	AMyDefaultPawn* MyDefaultPawn = Cast<AMyDefaultPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	MyDefaultPawn->BuildingStaticMeshComponent = nullptr;
 	MyDefaultPawn->TimelineStart(this);
 }
 
 void ADC_Building::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AMyDefaultPawn* InMyDefaultPawn = Cast<AMyDefaultPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	MyDefaultPawn = InMyDefaultPawn;
+
 	UUMG_Building* UMG_Building = Cast<UUMG_Building>(BuildingMainWidgetComponent->GetWidget());
 	UMG_Building->Button_Building->OnClicked.AddDynamic(
 		this, &ADC_Building::ViewBuildingButtonOnClicked);
+
 }
 
 void ADC_Building::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
+	FVector Distance = MyDefaultPawn->GetActorLocation() - GetActorLocation();
+	float Length = Distance.Length() * ScaleOfMainWidgetComp;
+	BuildingMainWidgetComponent->SetWorldScale3D(FVector(Length, Length, Length));
 	if (APlayerCameraManager* PlayerCamera = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0))
 	{
 		FVector StartLocation = BuildingMainWidgetComponent->GetComponentLocation();
